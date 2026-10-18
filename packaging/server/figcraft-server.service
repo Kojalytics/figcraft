@@ -4,8 +4,8 @@
 # Logs:    journalctl -u figcraft-server
 
 [Unit]
-Description=FigCraft collaboration server
-Documentation=https://github.com/storytold/figcraft/blob/main/docs/server.md
+Description=FigKoja collaboration server
+Documentation=https://github.com/Kojalytics/figcraft/blob/main/docs/server.md
 Wants=network-online.target
 After=network-online.target
 

@@ -7,13 +7,13 @@
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleDisplayName</key>
-  <string>FigCraft</string>
+  <string>FigKoja</string>
   <key>CFBundleName</key>
-  <string>FigCraft</string>
+  <string>FigKoja</string>
   <key>CFBundleExecutable</key>
-  <string>FigCraft</string>
+  <string>FigKoja</string>
   <key>CFBundleIdentifier</key>
-  <string>ai.storyteller.figcraft</string>
+  <string>com.kojalytics.figcraft</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundlePackageType</key>
@@ -29,7 +29,7 @@
   <key>FigCraftBuildCommit</key>
   <string>@BUILD_SHA@</string>
   <key>CFBundleIconFile</key>
-  <string>FigCraft</string>
+  <string>FigKoja</string>
   <key>LSApplicationCategoryType</key>
   <string>public.app-category.graphics-design</string>
   <!-- Must match MACOSX_DEPLOYMENT_TARGET in package.sh. Big Sur is the first release on
@@ -43,23 +43,23 @@
   <key>NSRequiresAquaSystemAppearance</key>
   <false/>
   <key>NSHumanReadableCopyright</key>
-  <string>Copyright © the FigCraft authors. MIT OR Apache-2.0.</string>
+  <string>Copyright © the FigKoja authors. MIT OR Apache-2.0.</string>
 
-  <!-- FigCraft's own format. -->
+  <!-- FigKoja's own format. -->
   <key>UTExportedTypeDeclarations</key>
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>ai.storyteller.figcraft.document</string>
+      <string>com.kojalytics.figcraft.document</string>
       <key>UTTypeDescription</key>
-      <string>FigCraft Document</string>
+      <string>FigKoja Document</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
         <string>public.content</string>
       </array>
       <key>UTTypeIconFile</key>
-      <string>FigCraft</string>
+      <string>FigKoja</string>
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.filename-extension</key>
@@ -70,12 +70,12 @@
     </dict>
   </array>
 
-  <!-- figcraft://join?... live session invite links open FigCraft. -->
+  <!-- figcraft://join?... live session invite links open FigKoja. -->
   <key>CFBundleURLTypes</key>
   <array>
     <dict>
       <key>CFBundleURLName</key>
-      <string>ai.storyteller.figcraft.invite</string>
+      <string>com.kojalytics.figcraft.invite</string>
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLSchemes</key>
@@ -87,15 +87,15 @@
   <array>
     <dict>
       <key>CFBundleTypeName</key>
-      <string>FigCraft Document</string>
+      <string>FigKoja Document</string>
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>LSHandlerRank</key>
       <string>Owner</string>
       <key>CFBundleTypeIconFile</key>
-      <string>FigCraft</string>
+      <string>FigKoja</string>
       <key>LSItemContentTypes</key>
-      <array><string>ai.storyteller.figcraft.document</string></array>
+      <array><string>com.kojalytics.figcraft.document</string></array>
     </dict>
     <!-- Offered under "Open With", never forced as the default. -->
     <dict>

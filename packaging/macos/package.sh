@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build, sign and (optionally) notarize the macOS release artifacts:
 #
-#   $DIST/figcraft-<version>-macos-<arch>.dmg          FigCraft.app on a drag-to-Applications DMG
+#   $DIST/figcraft-<version>-macos-<arch>.dmg          FigKoja.app on a drag-to-Applications DMG
 #   $DIST/figcraft-cli-<version>-macos-<arch>.zip      the headless CLI (when apps/figcraft-cli exists)
 #
 # Usage: packaging/macos/package.sh [--arch universal|aarch64|x86_64] [--skip-build]
@@ -39,20 +39,20 @@ export MACOSX_DEPLOYMENT_TARGET=11.0
 IDENTITY="${MACOS_SIGN_IDENTITY:--}"
 SHORT_VERSION="${VERSION%%-*}"
 WORK="$CARGO_TARGET_DIR/macos-package"
-APP="$WORK/FigCraft.app"
+APP="$WORK/FigKoja.app"
 DMG="$DIST/figcraft-$VERSION-macos-$ARCH.dmg"
 CLI_ZIP="$DIST/figcraft-cli-$VERSION-macos-$ARCH.zip"
 
 NOTARIZE=0
 if [ "$IDENTITY" = "-" ]; then
   warn "macOS: ad-hoc signing (no MACOS_SIGN_IDENTITY); artifacts are not notarized"
-elif [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_PASSWORD:-}" ] && [ -n "${APPLE_TEAM_ID:-}" ]; then
+elif [ -n "${NOTARY_PROFILE:-}" ] || { [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_PASSWORD:-}" ] && [ -n "${APPLE_TEAM_ID:-}" ]; }; then
   NOTARIZE=1
 else
   warn "macOS: APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID incomplete; signed but not notarized"
 fi
 
-echo "==> FigCraft $VERSION for macOS ($ARCH; ${BINS[*]}), identity: $IDENTITY, notarize: $NOTARIZE"
+echo "==> FigKoja $VERSION for macOS ($ARCH; ${BINS[*]}), identity: $IDENTITY, notarize: $NOTARIZE"
 
 # ---- build -------------------------------------------------------------------------------------
 if [ "$SKIP_BUILD" = 0 ]; then
@@ -82,15 +82,27 @@ sign() {
 
 notarize() {
   local file="$1" out id status
+  # NOTARY_PROFILE: a Keychain profile from `xcrun notarytool store-credentials` (no password in env).
+  local auth=(--apple-id "${APPLE_ID:-}" --password "${APPLE_PASSWORD:-}" --team-id "${APPLE_TEAM_ID:-}")
+  [ -n "${NOTARY_PROFILE:-}" ] && auth=(--keychain-profile "$NOTARY_PROFILE")
   echo "==> notarizing $(basename "$file") (this can take a few minutes)"
-  out="$(xcrun notarytool submit "$file" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
-    --team-id "$APPLE_TEAM_ID" --wait --timeout 1h --output-format json)" || true
+  out="$(xcrun notarytool submit "$file" "${auth[@]}" --output-format json)" || true
   echo "$out"
   id="$(printf '%s' "$out" | plutil -extract id raw -o - - 2>/dev/null || true)"
-  status="$(printf '%s' "$out" | plutil -extract status raw -o - - 2>/dev/null || true)"
+  status=""
+  # Apple can take long (a new account: an hour or more). A dropped connection only ends this
+  # wait, not the submission, so ask again.
+  for _ in 1 2 3 4 5 6; do
+    [ -n "$id" ] || break
+    out="$(xcrun notarytool wait "$id" "${auth[@]}" --timeout 1h --output-format json)" || true
+    echo "$out"
+    status="$(printf '%s' "$out" | plutil -extract status raw -o - - 2>/dev/null || true)"
+    case "$status" in Accepted | Invalid | Rejected) break ;; esac
+    sleep 30
+  done
   if [ "$status" != "Accepted" ]; then
     if [ -n "$id" ]; then
-      xcrun notarytool log "$id" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
+      xcrun notarytool log "$id" "${auth[@]}" || true
     fi
     echo "error: notarization of $(basename "$file") failed (status: ${status:-unknown})" >&2
     exit 1
@@ -101,20 +113,20 @@ notarize() {
 # The .icns is generated here from the committed PNGs (assets/app-icon/figcraft-<size>.png, made by
 # `cargo xtask icon`); it is never committed.
 ICONS="$ROOT/assets/app-icon"
-ICONSET="$WORK/FigCraft.iconset"
+ICONSET="$WORK/FigKoja.iconset"
 mkdir -p "$ICONSET"
 for s in 16 32 128 256 512; do
   cp "$ICONS/figcraft-$s.png" "$ICONSET/icon_${s}x${s}.png"
   cp "$ICONS/figcraft-$((s * 2)).png" "$ICONSET/icon_${s}x${s}@2x.png"
 done
-iconutil -c icns -o "$WORK/FigCraft.icns" "$ICONSET"
+iconutil -c icns -o "$WORK/FigKoja.icns" "$ICONSET"
 
-# ---- FigCraft.app ------------------------------------------------------------------------------
+# ---- FigKoja.app ------------------------------------------------------------------------------
 echo "==> assembling $APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 # Executable and icon carry the display name (CFBundleExecutable / CFBundleIconFile).
-cp "$WORK/bin/figcraft" "$APP/Contents/MacOS/FigCraft"
-cp "$WORK/FigCraft.icns" "$APP/Contents/Resources/FigCraft.icns"
+cp "$WORK/bin/figcraft" "$APP/Contents/MacOS/FigKoja"
+cp "$WORK/FigKoja.icns" "$APP/Contents/Resources/FigKoja.icns"
 # Licences of the embedded craft-fonts fonts (only when built with CRAFT_FONTS_DIR).
 if [ -n "${CRAFT_FONTS_DIR:-}" ]; then
   mkdir -p "$APP/Contents/Resources/Licenses"
@@ -128,13 +140,13 @@ printf 'APPL????' >"$APP/Contents/PkgInfo"
 
 # Sign inside-out: nested code first, then the bundle itself (no --deep on the final signature).
 # Today the only nested code is the main executable; frameworks/helpers would be signed here too.
-sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP/Contents/MacOS/FigCraft"
+sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP/Contents/MacOS/FigKoja"
 sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP"
 codesign --verify --strict --deep --verbose=2 "$APP"
 
 if [ "$NOTARIZE" = 1 ]; then
-  ditto -c -k --keepParent "$APP" "$WORK/FigCraft-notarize.zip"
-  notarize "$WORK/FigCraft-notarize.zip"
+  ditto -c -k --keepParent "$APP" "$WORK/FigKoja-notarize.zip"
+  notarize "$WORK/FigKoja-notarize.zip"
   retry xcrun stapler staple "$APP"
   retry xcrun stapler validate "$APP"
   spctl --assess --type execute -vvv "$APP"
@@ -144,12 +156,12 @@ fi
 echo "==> building $DMG"
 STAGE="$WORK/dmg"
 mkdir -p "$STAGE"
-ditto "$APP" "$STAGE/FigCraft.app"
+ditto "$APP" "$STAGE/FigKoja.app"
 ln -s /Applications "$STAGE/Applications"
 rm -f "$DMG" "$WORK/raw.dmg"
 # makehybrid + convert builds the image without attaching a device, unlike `create -srcfolder`,
 # which is flaky on CI runners ("Resource busy") and hangs in sandboxed sessions.
-hdiutil makehybrid -hfs -hfs-volume-name "FigCraft" -hfs-openfolder "$STAGE" -o "$WORK/raw.dmg" "$STAGE"
+hdiutil makehybrid -hfs -hfs-volume-name "FigKoja" -hfs-openfolder "$STAGE" -o "$WORK/raw.dmg" "$STAGE"
 hdiutil convert "$WORK/raw.dmg" -format UDZO -imagekey zlib-level=9 -o "$DMG"
 rm -f "$WORK/raw.dmg"
 sign "$DMG"
@@ -170,7 +182,7 @@ if [ "$HAS_CLI" = 1 ]; then
   copy_docs "$CLI_DIR"
   # Same Developer ID and hardened runtime as the app, with an explicit reverse-DNS identifier
   # (codesign would otherwise use the bare file name).
-  sign --options runtime --identifier ai.storyteller.figcraft-cli "$CLI_DIR/figcraft-cli"
+  sign --options runtime --identifier com.kojalytics.figcraft-cli "$CLI_DIR/figcraft-cli"
   codesign --verify --strict --verbose=2 "$CLI_DIR/figcraft-cli"
   rm -f "$CLI_ZIP"
   ditto -c -k --keepParent "$CLI_DIR" "$CLI_ZIP"

@@ -27,7 +27,7 @@
 #   -h, --help         this text
 set -euo pipefail
 
-REPO="storytold/figcraft"
+REPO="Kojalytics/figcraft"
 CONFIG_DIR=/etc/figcraft-server
 CONFIG="$CONFIG_DIR/server.toml"
 DATA=/var/lib/figcraft-server
@@ -394,7 +394,7 @@ cat <<EOF
 
 figcraft-server is running behind Caddy.
 
-  Publish:   in FigCraft, Share > Publish to server..., address wss://$HOST/
+  Publish:   in FigKoja, Share > Publish to server..., address wss://$HOST/
              $(if [ "$OPEN" = true ]; then echo "(open to the public: no key needed; each file gets an owner token)"; else echo "(with the key: $ADMIN key)"; fi)
   Check:     curl https://$HOST/healthz      (once DNS points here and Caddy has its certificate)
   Logs:      journalctl -u $SERVICE -f

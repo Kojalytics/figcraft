@@ -2,17 +2,17 @@
 <!-- AppStream metadata (software centres, Flathub). Template: package.sh and the Flatpak
      manifest substitute @VERSION@ and @DATE@ from Cargo.toml and the build date. -->
 <component type="desktop-application">
-  <id>ai.storyteller.figcraft</id>
+  <id>com.kojalytics.figcraft</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT OR Apache-2.0</project_license>
-  <name>FigCraft</name>
+  <name>FigKoja</name>
   <summary>Design and prototype user interfaces</summary>
-  <developer id="ai.storyteller">
+  <developer id="com.kojalytics">
     <name>Learning Machines LLC</name>
   </developer>
   <description>
     <p>
-      FigCraft is an open-source, native interface design and prototyping tool. Lay out screens
+      FigKoja is an open-source, native interface design and prototyping tool. Lay out screens
       on an infinite canvas with frames, auto layout and constraints, build reusable components
       and variants, and link screens into clickable prototypes.
     </p>
@@ -25,13 +25,13 @@
       <li>Every action is a command, scriptable from a CLI, a JSON control channel and an MCP server</li>
     </ul>
   </description>
-  <launchable type="desktop-id">ai.storyteller.figcraft.desktop</launchable>
-  <icon type="stock">ai.storyteller.figcraft</icon>
+  <launchable type="desktop-id">com.kojalytics.figcraft.desktop</launchable>
+  <icon type="stock">com.kojalytics.figcraft</icon>
   <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
-  <url type="homepage">https://getartcraft.com/apps/figcraft</url>
-  <url type="bugtracker">https://github.com/storytold/figcraft/issues</url>
-  <url type="help">https://github.com/storytold/figcraft</url>
-  <url type="contact">https://discord.gg/artcraft</url>
+  <url type="homepage">https://www.kojalytics.com/koja-apps</url>
+  <url type="bugtracker">https://github.com/Kojalytics/figcraft/issues</url>
+  <url type="help">https://github.com/Kojalytics/figcraft</url>
+  <url type="contact">https://www.kojalytics.com/contact</url>
   <categories>
     <!-- Freedesktop registered categories only ("Design" isn't one; the .desktop file says X-Design). -->
     <category>Graphics</category>
