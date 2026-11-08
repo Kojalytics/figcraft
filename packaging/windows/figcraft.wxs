@@ -20,13 +20,13 @@
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package
       Name="FigKoja"
-      Manufacturer="Learning Machines LLC"
+      Manufacturer="Kojalytics"
       Version="$(var.Version)"
-      UpgradeCode="7F8B9827-D065-41B7-A514-2A454B21F484"
+      UpgradeCode="067980A2-119F-5514-B288-87AE4B233322"
       Scope="perMachine"
       Compressed="yes"
       Language="1033">
-    <SummaryInformation Description="FigKoja interface design and prototyping tool" Manufacturer="Learning Machines LLC" />
+    <SummaryInformation Description="FigKoja interface design and prototyping tool" Manufacturer="Kojalytics" />
     <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
          (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -83,7 +83,7 @@
 
   <Fragment>
     <ComponentGroup Id="FigcraftFiles" Directory="INSTALLFOLDER">
-      <Component Id="FigcraftApp" Guid="238228C3-4C1D-4B33-8C5D-C31B65BC2DA4">
+      <Component Id="FigcraftApp" Guid="09F1086C-15DB-50F6-8F7A-BF2483366DC5">
         <File Id="FigcraftExe" Source="$(var.BinDir)\figcraft.exe" KeyPath="yes">
           <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="FigKoja"
               Description="FigKoja interface design and prototyping" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
